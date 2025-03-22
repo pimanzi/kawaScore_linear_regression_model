@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'result_screen.dart';
 
 class InputFormScreen extends StatefulWidget {
@@ -12,28 +14,58 @@ class InputFormScreen extends StatefulWidget {
 class _InputFormScreenState extends State<InputFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _aromaController = TextEditingController();
-  final TextEditingController _flavourController = TextEditingController();
-  final TextEditingController _altitudeController = TextEditingController();
-  final TextEditingController _sweetnessController = TextEditingController();
   final TextEditingController _acidityController = TextEditingController();
-  final TextEditingController _balanceController = TextEditingController();
+  final TextEditingController _bodyController = TextEditingController();
+  final TextEditingController _uniformityController = TextEditingController();
+  final TextEditingController _cleanCupController = TextEditingController();
+  final TextEditingController _sweetnessController = TextEditingController();
 
   @override
   void dispose() {
     _aromaController.dispose();
-    _flavourController.dispose();
-    _altitudeController.dispose();
-    _sweetnessController.dispose();
     _acidityController.dispose();
-    _balanceController.dispose();
+    _bodyController.dispose();
+    _uniformityController.dispose();
+    _cleanCupController.dispose();
+    _sweetnessController.dispose();
     super.dispose();
+  }
+
+  Future<double> predictCoffeeScore({
+    required double aroma,
+    required double acidity,
+    required double body,
+    required double uniformity,
+    required double cleanCup,
+    required double sweetness,
+  }) async {
+    final url = Uri.parse(
+        'https://kawascore-linear-regression-model.onrender.com/predict');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'aroma': aroma,
+        'acidity': acidity,
+        'body': body,
+        'uniformity': uniformity,
+        'Clean Cup': cleanCup,
+        'sweetness': sweetness,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // Parse the response and return the prediction
+      final responseData = jsonDecode(response.body);
+      return responseData['predicted_total_cup_points'];
+    } else {
+      throw Exception('Failed to get prediction');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Get screen size to calculate form width
     final screenWidth = MediaQuery.of(context).size.width;
-    // Calculate form width - on large screens limit width, on small use most of screen
     final formWidth = screenWidth > 600 ? 500.0 : screenWidth * 0.9;
 
     return Scaffold(
@@ -81,82 +113,107 @@ class _InputFormScreenState extends State<InputFormScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Rate each attribute from 0-10 (except altitude which is in meters)',
+                      'Rate each attribute from 0-10 (decimal values allowed)',
                       style: Theme.of(context).textTheme.bodyMedium,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 32),
-
-                    // Input Fields - arranged in grid/columns
                     _buildInputField(
                       context,
                       'Aroma',
-                      'Rate from 0-10',
+                      'The fragrance of the coffee (0-10)',
                       _aromaController,
                       hint: '7.5',
                     ),
                     const SizedBox(height: 16),
-
-                    _buildInputField(
-                      context,
-                      'Flavour',
-                      'Rate from 0-10',
-                      _flavourController,
-                      hint: '8.0',
-                    ),
-                    const SizedBox(height: 16),
-
-                    _buildInputField(
-                      context,
-                      'Altitude',
-                      'In meters',
-                      _altitudeController,
-                      isInteger: true,
-                      hint: '1500',
-                    ),
-                    const SizedBox(height: 16),
-
-                    _buildInputField(
-                      context,
-                      'Sweetness',
-                      'Rate from 0-10',
-                      _sweetnessController,
-                      hint: '6.5',
-                    ),
-                    const SizedBox(height: 16),
-
                     _buildInputField(
                       context,
                       'Acidity',
-                      'Rate from 0-10',
+                      'The brightness and sharpness of the coffee (0-10)',
                       _acidityController,
+                      hint: '8.0',
+                    ),
+                    const SizedBox(height: 16),
+                    _buildInputField(
+                      context,
+                      'Body',
+                      'The weight and texture of the coffee (0-10)',
+                      _bodyController,
                       hint: '7.0',
                     ),
                     const SizedBox(height: 16),
-
                     _buildInputField(
                       context,
-                      'Balance',
-                      'Rate from 0-10',
-                      _balanceController,
+                      'Uniformity',
+                      'Consistency of the coffee across cups (0-10)',
+                      _uniformityController,
+                      hint: '9.0',
+                    ),
+                    const SizedBox(height: 16),
+                    _buildInputField(
+                      context,
+                      'Clean Cup',
+                      'Absence of defects in the coffee (0-10)',
+                      _cleanCupController,
+                      hint: '10.0',
+                    ),
+                    const SizedBox(height: 16),
+                    _buildInputField(
+                      context,
+                      'Sweetness',
+                      'The natural sweetness of the coffee (0-10)',
+                      _sweetnessController,
                       hint: '8.5',
                     ),
-
                     const SizedBox(height: 32),
-
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            // Simply navigate to result screen with dummy data
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ResultScreen(),
-                              ),
-                            );
+                            try {
+                              final aroma = double.parse(_aromaController.text);
+                              final acidity =
+                                  double.parse(_acidityController.text);
+                              final body = double.parse(_bodyController.text);
+                              final uniformity =
+                                  double.parse(_uniformityController.text);
+                              final cleanCup =
+                                  double.parse(_cleanCupController.text);
+                              final sweetness =
+                                  double.parse(_sweetnessController.text);
+
+                              final prediction = await predictCoffeeScore(
+                                aroma: aroma,
+                                acidity: acidity,
+                                body: body,
+                                uniformity: uniformity,
+                                cleanCup: cleanCup,
+                                sweetness: sweetness,
+                              );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ResultScreen(
+                                    prediction: prediction,
+                                    inputValues: {
+                                      'Aroma': aroma,
+                                      'Acidity': acidity,
+                                      'Body': body,
+                                      'Uniformity': uniformity,
+                                      'CleanCup': cleanCup,
+                                      'Sweetness': sweetness,
+                                    },
+                                  ),
+                                ),
+                              );
+                            } catch (e) {
+                              // Show an error message if the API call fails
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Error: $e')),
+                              );
+                            }
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -188,7 +245,6 @@ class _InputFormScreenState extends State<InputFormScreen> {
     String label,
     String helper,
     TextEditingController controller, {
-    bool isInteger = false,
     String? hint,
   }) {
     return SizedBox(
@@ -210,15 +266,17 @@ class _InputFormScreenState extends State<InputFormScreen> {
             borderSide: BorderSide(color: Colors.brown[700]!, width: 2),
           ),
         ),
-        keyboardType: TextInputType.numberWithOptions(decimal: !isInteger),
+        keyboardType: TextInputType.numberWithOptions(decimal: true),
         inputFormatters: [
-          isInteger
-              ? FilteringTextInputFormatter.digitsOnly
-              : FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
+          FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
         ],
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'Please enter a value';
+          }
+          final numericValue = double.tryParse(value);
+          if (numericValue == null || numericValue < 0 || numericValue > 10) {
+            return 'Value must be between 0 and 10';
           }
           return null;
         },

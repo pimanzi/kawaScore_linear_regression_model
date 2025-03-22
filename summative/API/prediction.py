@@ -29,16 +29,15 @@ class CoffeeFeatures(BaseModel):
     sweetness: confloat(ge=0, le=10)
 
 
-# Initialize FastAPI app
 app = FastAPI()
 
-# Enable CORS for all origins
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods
-    allow_headers=["*"],  # Allow all headers
+    allow_methods=["*"], 
+    allow_headers=["*"],  
 )
 
 
