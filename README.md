@@ -65,7 +65,7 @@ The histograms below show the distribution of key features like Aroma, Acidity, 
 
 ## API Endpoint for prediction
 
-🔗 **API Endpoint for prediction**: [https://kawascore-linear-regression-model.onrender.com/predict](https://kawascore-linear-regression-model.onrender.com/docs)
+🔗 **API Endpoint for prediction**: [https://kawascore-linear-regression-model.onrender.com/predict](https://kawascore-linear-regression-model.onrender.com/predict)
 
 ### Example Request
 
