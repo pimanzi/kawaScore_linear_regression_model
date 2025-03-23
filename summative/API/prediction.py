@@ -1,7 +1,3 @@
-"""
-FastAPI app for predicting Total Cup Points for coffee samples.
-"""
-
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, confloat, Field
 import joblib
@@ -9,7 +5,7 @@ import numpy as np
 from fastapi.middleware.cors import CORSMiddleware
 
 # Load the trained model
-MODEL_PATH = "../linear_regression/best_model.joblib."
+MODEL_PATH = "../linear_regression/best_model.joblib"
 try:
     MODEL = joblib.load(MODEL_PATH)
 except FileNotFoundError as err:
@@ -29,16 +25,45 @@ class CoffeeFeatures(BaseModel):
     sweetness: confloat(ge=0, le=10)
 
 
-app = FastAPI()
-
+app = FastAPI(
+    title="KawaScore Coffee Quality Prediction API",
+    description="An API to predict the Total Cup Points of coffee samples based on sensory attributes.",
+    version="1.0.0",
+)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"], 
-    allow_headers=["*"],  
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
+
+@app.get("/")
+def read_root():
+    """
+    Root endpoint that provides a welcome message and instructions.
+    """
+    return {
+        "message": "Welcome to the KawaScore Coffee Quality Prediction API!",
+        "instructions": {
+            "description": "Use the `/predict` endpoint to predict the Total Cup Points of coffee samples.",
+            "endpoint": "/predict",
+            "example_request": {
+                "aroma": 7.5,
+                "acidity": 8.0,
+                "body": 7.0,
+                "uniformity": 9.0,
+                "clean_cup": 10.0,
+                "sweetness": 8.5,
+            },
+            "example_response": {
+                "predicted_total_cup_points": 85.3
+            },
+            "documentation": "Visit /docs for interactive API documentation.",
+        },
+    }
 
 
 @app.post("/predict")
@@ -68,7 +93,13 @@ def predict(coffee_features: CoffeeFeatures):
         return {"predicted_total_cup_points": prediction[0]}
 
     except Exception as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "message": "An error occurred while processing your request.",
+                "error": str(exc),
+            },
+        ) from exc
 
 
 if __name__ == "__main__":
