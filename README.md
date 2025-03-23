@@ -9,7 +9,7 @@
 3. [Visualizations](#visualizations)
    - [Correlation Heatmap](#1-correlation-heatmap)
    - [Feature Distributions](#2-feature-distributions-histograms)
-4. [API Endpoint](#api-endpoint)
+4. [Swagger UI Documentation](#swagger-ui-documentation)
 5. [YouTube Video Demo](#youtube-video-demo)
 6. [Running the Mobile App](#running-the-mobile-app)
    - [Prerequisites](#prerequisites)
@@ -35,7 +35,7 @@ The dataset used in this project is sourced from **Kaggle**: [Coffee Quality Ins
 
 The Coffee Quality Institute (CQI) is a non-profit organization dedicated to improving the quality and value of coffee worldwide. Founded in 1996, CQI works with coffee growers, processors, roasters, and other stakeholders to promote coffee quality standards, sustainability, and the development of the specialty coffee industry.
 
-The dataset contained many columns; however, in my linear regression model, these columns are the ones selected to train our model based on their correlation with the target variable (`Total Cup Points`):
+The dataset contained many columns.However, in my linear regression model, these columns are the ones selected to train our model based on their correlation with the target variable (`Total Cup Points`):
 
 - **Aroma**: The fragrance of the coffee.
 - **Acidity**: The brightness and sharpness of the coffee.
@@ -63,11 +63,9 @@ The histograms below show the distribution of key features like Aroma, Acidity, 
 
 ---
 
-## API Endpoint
+## API Endpoint for prediction
 
-The trained Linear Regression model is deployed as a REST API using FastAPI. You can access the API documentation and test it using the following link:
-
-🔗 **API Documentation**: [https://kawascore-linear-regression-model.onrender.com/docs](https://kawascore-linear-regression-model.onrender.com/docs)
+🔗 **API Endpoint for prediction**: [https://kawascore-linear-regression-model.onrender.com/predict](https://kawascore-linear-regression-model.onrender.com/docs)
 
 ### Example Request
 
@@ -77,10 +75,16 @@ The trained Linear Regression model is deployed as a REST API using FastAPI. You
   "acidity": 8.0,
   "body": 7.0,
   "uniformity": 9.0,
-  "clean_cup": 10.0,
+  "Clean Cup": 10.0,
   "sweetness": 8.5
 }
 ```
+
+## Swagger UI Documentation
+
+The trained Linear Regression model is deployed as a REST API using FastAPI. You can access the API documentation and test it using the following link:
+
+🔗 **API Documentation**: [https://kawascore-linear-regression-model.onrender.com/docs](https://kawascore-linear-regression-model.onrender.com/docs)
 
 ## YouTube Video Demo
 
@@ -102,16 +106,22 @@ Follow these steps to run the mobile app on your local machine:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/your-repo-name.git
+   git clone https://github.com/pimanzi/https://github.com/pimanzi/kawaScore_linear_regression_model.git
    ```
 
-2. Install depedencies
+2. Navigate to flutterapp directory
+
+```bash
+ cd summative/flutterapp
+```
+
+3. Install depedencies
 
    ```bash
    flutter pub get
    ```
 
-3. Run the app
+4. Run the app
 
    ```
    flutter run
@@ -131,4 +141,4 @@ Follow these steps to run the mobile app on your local machine:
 For questions or feedback, feel free to reach out:
 
 - **Email**: imanzikabisa@gmail.com
-- **GitHub**: [your-username](https://github.com/pimanzi)
+- **GitHub**: [Github-Username](https://github.com/pimanzi)
