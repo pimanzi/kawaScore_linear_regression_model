@@ -17,7 +17,7 @@ class ResultScreen extends StatelessWidget {
     final qualityText = qualityInfo['text'] as String;
 
     final screenWidth = MediaQuery.of(context).size.width;
-    final circleSize = screenWidth * 0.4; // 40% of screen width
+    final circleSize = screenWidth * 0.5; // Increased from 0.4 to 0.5
 
     return Scaffold(
       appBar: AppBar(
@@ -54,25 +54,32 @@ class ResultScreen extends StatelessWidget {
                     ),
                   ),
                   child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "${prediction.toStringAsFixed(2)}%",
-                          style: TextStyle(
-                            fontSize: 42,
-                            fontWeight: FontWeight.bold,
-                            color: qualityColor,
-                          ),
+                    child: FittedBox(
+                      // Added FittedBox to ensure text scales properly
+                      fit: BoxFit.scaleDown,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "${prediction.toStringAsFixed(2)}%", // Kept the % sign
+                              style: TextStyle(
+                                fontSize: 38, // Reduced from 42
+                                fontWeight: FontWeight.bold,
+                                color: qualityColor,
+                              ),
+                            ),
+                            Text(
+                              'points',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: qualityColor,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          'points',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: qualityColor,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
