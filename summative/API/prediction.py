@@ -5,7 +5,7 @@ import numpy as np
 from fastapi.middleware.cors import CORSMiddleware
 
 # Load the trained model
-MODEL_PATH = "../linear_regression/best_model.joblib"
+MODEL_PATH = "../linear_regression/best_model.joblib."
 try:
     MODEL = joblib.load(MODEL_PATH)
 except FileNotFoundError as err:
@@ -25,18 +25,15 @@ class CoffeeFeatures(BaseModel):
     sweetness: confloat(ge=0, le=10)
 
 
-app = FastAPI(
-    title="KawaScore Coffee Quality Prediction API",
-    description="An API to predict the Total Cup Points of coffee samples based on sensory attributes.",
-    version="1.0.0",
-)
+app = FastAPI()
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"], 
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"], 
+    allow_headers=["*"],  
 )
 
 
@@ -55,7 +52,7 @@ def read_root():
                 "acidity": 8.0,
                 "body": 7.0,
                 "uniformity": 9.0,
-                "clean_cup": 10.0,
+                "Clean Cup": 10.0,  # Using the alias "Clean Cup"
                 "sweetness": 8.5,
             },
             "example_response": {
@@ -93,13 +90,7 @@ def predict(coffee_features: CoffeeFeatures):
         return {"predicted_total_cup_points": prediction[0]}
 
     except Exception as exc:
-        raise HTTPException(
-            status_code=400,
-            detail={
-                "message": "An error occurred while processing your request.",
-                "error": str(exc),
-            },
-        ) from exc
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 if __name__ == "__main__":
